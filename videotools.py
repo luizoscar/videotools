@@ -61,9 +61,9 @@ class VideoProgressDialog(Gtk.Dialog):
         for arquivo in self.lista_arquivos:
             if os.path.isfile(arquivo):
                 totalBytes += os.stat(arquivo).st_size
-            
+
         # Label com o título da atividade
-        grid.attach(Gtk.Label(label="Efetuando o processamento de " + str(len(self.lista_arquivos)) + 
+        grid.attach(Gtk.Label(label="Efetuando o processamento de " + str(len(self.lista_arquivos)) +
                               " vídeos - " + seconds_to_time(segundosTotal) + " (" + human_size(totalBytes) + ")", halign=Gtk.Align.START), 0, 0, 6, 1)
 
         # Progresso total
@@ -110,7 +110,7 @@ class VideoProgressDialog(Gtk.Dialog):
         ultimaLinha = None
 
         global processo_ffmpeg
-                 
+
         for arquivo in self.lista_arquivos:
             try:
                 if not os.path.isfile(arquivo) and self.arquivoDestino is None:
@@ -127,7 +127,7 @@ class VideoProgressDialog(Gtk.Dialog):
                     sufixoArquivo = extensao
                 else:
                     sufixoArquivo = self.sufixoArquivo
-                
+
                 # Cria o nome do arquivo de destino
                 novo_arquivo = self.dir_destino + os.sep + nome[:nome.rfind(".")] + sufixoArquivo
                 novo_arquivo = novo_arquivo.replace("${EXTENSAO}", extensao)
@@ -184,24 +184,24 @@ class VideoProgressDialog(Gtk.Dialog):
 
                             # Estatísticas da conversão total
                             titulo_barra_total = "[" + seconds_to_time(self.segundosConcluidos) + " / " + seconds_to_time(self.segundosTotal) + "]"
-                            
+
                             titulo_label_total = "Original: " + os.path.basename(arquivo) + " - " + seconds_to_time(max_secs)
                             if os.path.isfile(novo_arquivo):
                                 titulo_label_total = titulo_label_total + " (" + human_size(os.stat(arquivo).st_size) + ")"
-                                
+
                             progresso_total = (self.segundosConcluidos + cur_secs) / self.segundosTotal  # Percentual do progresso
                             progresso_arquivo = cur_secs / max_secs
 
                             titulo_label_atual = "Destino: " + os.path.basename(novo_arquivo) + " - " + seconds_to_time(cur_secs)
                             if os.path.isfile(novo_arquivo):
                                 titulo_label_atual = titulo_label_atual + " (" + human_size(os.stat(novo_arquivo).st_size) + ")"
-                                
+
                             # Atualiza as estatíticas do total e o nome do arquivo de destino
                             GLib.idle_add(self.update_progess, titulo_barra_total, titulo_label_total, titulo_label_atual, progresso_arquivo, progresso_total)
 
                         except ValueError:
                             debug("Falha ao converter o horário: " + tmp)
-    
+
                     elif line.startswith(FRAME) and TIME in line:
                         try:
                             # Captura o tempo da conversão (timestamp)
@@ -217,21 +217,21 @@ class VideoProgressDialog(Gtk.Dialog):
                         progresso_total = (self.segundosConcluidos + cur_secs) / self.segundosTotal  # Percentual do progresso
                         progresso_arquivo = cur_secs / max_secs
                         titulo_barra_total = "[" + seconds_to_time(self.segundosConcluidos + cur_secs) + " / " + seconds_to_time(self.segundosTotal) + "]"
-                        
+
                         if os.path.isfile(novo_arquivo):
                             titulo_label_atual = "Destino: " + os.path.basename(novo_arquivo) + " - " + seconds_to_time(cur_secs) + " (" + human_size(os.stat(novo_arquivo).st_size) + ")"
                         GLib.idle_add(self.update_progess, titulo_barra_total, titulo_label_total, titulo_label_atual, progresso_arquivo, progresso_total)
 
                 # Ao final do arquivo, incrementa o tempo ao tempo de concluídos
                 self.segundosConcluidos = self.segundosConcluidos + cur_secs
-                
+
                 # Finaliza o processo do ffmpeg
                 processo_ffmpeg.stdout.close()
                 exitCode = processo_ffmpeg.wait()
                 # Verifica o error code do processo
-                self.failed = self.failed or exitCode != 0 
+                self.failed = self.failed or exitCode != 0
                 if self.failed:
-                    debug("Mensagem de erro: " + ultimaLinha) 
+                    debug("Mensagem de erro: " + ultimaLinha)
 
                 if os.path.isfile(arquivo):
                     debug("Vídeo original: " + arquivo + " (" + human_size(os.stat(arquivo).st_size) + ")")
@@ -546,9 +546,9 @@ class ConcatenarDialog(Gtk.Dialog):
         self.textview.get_buffer().set_text(tmp)
 
         # Codec de destino
-        flowbox = Gtk.FlowBox()       
+        flowbox = Gtk.FlowBox()
         flowbox.add(Gtk.Label(label="Codec do novo arquivo:", halign=Gtk.Align.START))
-        
+
         self.combo_codec = Gtk.ComboBoxText()
         for codec in CODECS_VIDEO:
             self.combo_codec.append_text(codec)
@@ -556,7 +556,7 @@ class ConcatenarDialog(Gtk.Dialog):
         flowbox.add(self.combo_codec)
 
         self.grid.attach(flowbox, 0, 7, 3, 1)
-               
+
         # Arquivo de destino
         box = Gtk.Box()
         box.pack_start(Gtk.Label(label="Arquivo a ser gerado:", halign=Gtk.Align.START), False, False, 4)
@@ -752,7 +752,7 @@ class MainWindow(Gtk.Window):
 
         self.add(grid)
         self.do_atualiza_contador_selecao()
-        
+
         i1 = Gtk.MenuItem("Marcar todos os videos")
         i1.connect("activate", self.do_marca_todos)
         self.popup_menu.append(i1)
@@ -765,7 +765,7 @@ class MainWindow(Gtk.Window):
         i4 = Gtk.MenuItem("Apagar videos marcados")
         i4.connect("activate", self.do_apagar_selecionados)
         self.popup_menu.append(i4)
-                  
+
         self.popup_menu.show_all()
 
     def do_show_popup(self, tv, event):  # @UnusedVariable
@@ -783,14 +783,14 @@ class MainWindow(Gtk.Window):
                 for arquivo in arquivos:
                     debug("Removendo arquivo "+arquivo)
                     os.remove(arquivo)
-                dialog.destroy()
-            
-        self.do_load_file_list(widget)
-    
+                self.do_load_file_list(widget)
+            dialog.destroy()
+
+
     def do_marcar_nao_h265(self, widget):  # @UnusedVariable
         debug("MenuItem: Marcar videos não H265")
         for row in self.store:
-            if 'hevc' not in row[3]: 
+            if 'hevc' not in row[3]:
                 row[0] = True
 
         self.do_atualiza_contador_selecao()
@@ -808,7 +808,7 @@ class MainWindow(Gtk.Window):
             row[0] = False
 
         self.do_atualiza_contador_selecao()
-        
+
     def do_click_origem(self, widget):  # @UnusedVariable
         debug("Selecionando diretório de origem")
 
@@ -838,12 +838,12 @@ class MainWindow(Gtk.Window):
             params = ["-i", "${ORIGEM}"]
             params.extend(codec["params"])
             params.append("${DESTINO}")
-            
+
             arquivos = self.listar_arquivos_selecionados()
             segundosTotal = self.obter_total_segundos()
 
             self.executa_ffmpeg("Conversão dos videos para o formato " + nome_codec, params, arquivos, segundosTotal, sufixoArquivo, None, True)
-   
+
     def do_video_concatenate(self, widget):  # @UnusedVariable
 
         # Remove o arquivo temporário da lista de arquivos
@@ -858,7 +858,7 @@ class MainWindow(Gtk.Window):
             params = ["-f", "concat", "-safe", "0", "-i", ARQUIVO_VIDEOS_CONCATENA]
             params.extend(codec["params"])
             params.append("${DESTINO}")
-        
+
             print(str(params))
             segundosTotal = self.obter_total_segundos()
             self.executa_ffmpeg("Concatenação de vídeos", params, None, segundosTotal, None, aquivoDestino, True)
@@ -983,7 +983,7 @@ class MainWindow(Gtk.Window):
 
             arquivos = self.listar_arquivos_selecionados()
             segundosTotal = self.obter_total_segundos()
-    
+
             self.executa_ffmpeg("Rotacionando o arquivo de vídeo", params, arquivos, segundosTotal, "_rotated.${EXTENSAO}", None, True)
 
     def do_load_file_list(self, widget):  # @UnusedVariable
@@ -1008,7 +1008,7 @@ class MainWindow(Gtk.Window):
                     processar = False
                     tamanho = human_size(os.stat(arquivo).st_size)
                     arquivoAbr = arquivo[posSrc:]
-    
+
                     self.store.insert(0, [
                         processar ,
                         arquivoAbr,
@@ -1030,7 +1030,7 @@ class MainWindow(Gtk.Window):
         lines = ""
         # Inicia o processo e concatena as linhas do output
         for line in iter(processo_ffmpeg.stdout.readline, ''):
-            
+
             # Considera apenas as linhas essenciais
             if line.find("Stream #0") or line.find(" Duration:"):
                 lines = lines + line
@@ -1083,7 +1083,7 @@ class MainWindow(Gtk.Window):
             if row[0]:
                 arquivos.append(self.edit_origem.get_text() + os.sep + row[1])
         return arquivos
-    
+
     def obter_total_segundos(self):
         segundos = 0
         for row in self.store:
@@ -1278,21 +1278,21 @@ def get_codec_info(codec):
     # Recupera os parâmtros do ffmpeg para conversão
     resp = None
     if VIDEO_H265 == codec:
-        resp = {"params":["-c:v", "libx265", "-acodec", "aac", "-strict", "-2"], "sufixo":"_H265.mp4"}        
+        resp = {"params":["-c:v", "libx265", "-acodec", "aac", "-strict", "-2"], "sufixo":"_H265.mp4"}
     elif VIDEO_H264 == codec:
-        resp = {"params":["-c:v", "libx264", "-acodec", "aac", "-strict", "-2"], "sufixo":"_H264.mp4"}        
-    elif VIDEO_VP8 == codec:            
-        resp = {"params":["-c:v", "libvpx", "-b:v", "1M", "-c:a", "libvorbis"], "sufixo":"_VP8.webm"}        
+        resp = {"params":["-c:v", "libx264", "-acodec", "aac", "-strict", "-2"], "sufixo":"_H264.mp4"}
+    elif VIDEO_VP8 == codec:
+        resp = {"params":["-c:v", "libvpx", "-b:v", "1M", "-c:a", "libvorbis"], "sufixo":"_VP8.webm"}
     elif VIDEO_VP9 == codec:
-        resp = {"params":["-c:v", "libvpx-vp9", "-b:v", "2M", "-c:a", "libopus"], "sufixo":"_VP9.webm"}        
+        resp = {"params":["-c:v", "libvpx-vp9", "-b:v", "2M", "-c:a", "libopus"], "sufixo":"_VP9.webm"}
     elif AUDIO_MP3 == codec:
-        resp = {"params":["-vn", "-f", "mp3", "-ab", "192000"], "sufixo":"_MP3.mp3"}        
+        resp = {"params":["-vn", "-f", "mp3", "-ab", "192000"], "sufixo":"_MP3.mp3"}
     elif AUDIO_FLAC == codec:
-        resp = {"params":[ "-vn", "-acodec", "flac"], "sufixo":"_FLAC.flac"}        
+        resp = {"params":[ "-vn", "-acodec", "flac"], "sufixo":"_FLAC.flac"}
     elif AUDIO_AAC == codec:
-        resp = {"params":[ "-vn", "-acodec", "aac", "-strict", "-2"], "sufixo":"AAC.m4a"}        
+        resp = {"params":[ "-vn", "-acodec", "aac", "-strict", "-2"], "sufixo":"AAC.m4a"}
     elif AUDIO_OGG == codec:
-        resp = {"params":["-vn", "-acodec", "libvorbis"], "sufixo":"_Vorbis.ogg"}        
+        resp = {"params":["-vn", "-acodec", "libvorbis"], "sufixo":"_Vorbis.ogg"}
     return resp
 
 
@@ -1305,16 +1305,16 @@ def get_ffmpeg_features():
         linhas = ""
         for line in iter(processo_ffmpeg.stdout.readline, ''):
             if "--" in line:
-                linhas = linhas + line            
-                    
+                linhas = linhas + line
+
         processo_ffmpeg.stdout.close()
         processo_ffmpeg.wait()
 
         ffmpeg_features = []
         pattern = re.compile("--enable-[^\s]+|disable-[^\s]+")
         for m in pattern.finditer(linhas):
-            ffmpeg_features.append(m.group())        
-    
+            ffmpeg_features.append(m.group())
+
     return ffmpeg_features
 
 
@@ -1371,12 +1371,18 @@ if not os.path.isfile(ARQUIVO_XML_SETTINGS):
     set_app_settings("extensoes_video", "wmv|avi|mpg|3gp|mov|m4v|mts|mp4|webm")
     set_app_settings("caminho_ffmpeg", "ffmpeg")
 
+
+win = None
+# Verifica a presença do ffmpeg
 if not spawn.find_executable(get_caminho_ffmpeg()):
-    print("Não foi possível encontrar o aplicativo necessário ffmpeg.")
-    print("Verifique a configuração do caminho do ffmpeg no arquivo settings.xml")
-    print("A configuração atual é: "+ get_caminho_ffmpeg())
-    sys.exit(2)    
-    
+    info = InputDialog(win, 'Informe o caminho para o ffmpeg', '', None).show_and_get_info()
+    if info is None or not spawn.find_executable(info):
+        print("Não foi possível encontrar o aplicativo necessário ffmpeg.")
+        print("Verifique a configuração do caminho do ffmpeg no arquivo settings.xml")
+        print("A configuração atual é: " + get_caminho_ffmpeg())
+        sys.exit(2)
+    else:
+        set_app_settings("caminho_ffmpeg",info)
 
 # Codecs de Video
 VIDEO_H265 = "Video H265"
@@ -1387,7 +1393,7 @@ CODECS_VIDEO = []
 
 if "--enable-libx264" in get_ffmpeg_features():
     CODECS_VIDEO.append(VIDEO_H264)
-    
+
 if "--enable-libx265" in get_ffmpeg_features():
     CODECS_VIDEO.append(VIDEO_H265)
 
@@ -1400,7 +1406,7 @@ AUDIO_MP3 = "Extrair audio - MP3"
 AUDIO_AAC = "Extrair audio - AAC"
 AUDIO_FLAC = "Extrair audio - FLAC"
 AUDIO_OGG = "Extrair audio - Ogg Vorbis"
-CODECS_AUDIO = [AUDIO_AAC, AUDIO_FLAC] 
+CODECS_AUDIO = [AUDIO_AAC, AUDIO_FLAC]
 
 if "--enable-libmp3lame" in get_ffmpeg_features():
     CODECS_AUDIO.append(AUDIO_MP3)
