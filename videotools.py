@@ -27,7 +27,7 @@ class VideoProgressDialog(Gtk.Dialog):
     """
     Dialog utilizada para exibir o progresso da conversão de vídeos
     """
-    
+
     mustStop = False
     failed = False
     parametrosFfmpeg = []
@@ -36,15 +36,14 @@ class VideoProgressDialog(Gtk.Dialog):
     segundosTotal = 0
     segundosConcluidos = 0
 
-    def __init__(self, parent, arquivos, destino, titulo, params, sufixoArquivo, arquivoDestino, segundosTotal):
+    def __init__(self, parent, arquivos, titulo, params, sufixoArquivo, arquivoDestino, segundosTotal):
         Gtk.Dialog.__init__(self, titulo, parent, 0,
                             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         self.set_size_request(250, 150)
         self.set_border_width(10)
-
+        
         self.lista_arquivos = arquivos
-        self.dir_destino = destino
         self.parametrosFfmpeg = params
         self.sufixoArquivo = sufixoArquivo
         self.arquivoDestino = arquivoDestino
@@ -67,7 +66,7 @@ class VideoProgressDialog(Gtk.Dialog):
                 totalBytes += os.stat(arquivo).st_size
 
         # Label com o título da atividade
-        grid.attach(Gtk.Label(label="Efetuando o processamento de " + str(len(self.lista_arquivos)) + 
+        grid.attach(Gtk.Label(label="Efetuando o processamento de " + str(len(self.lista_arquivos)) +
                               " vídeos - " + seconds_to_time(segundosTotal) + " (" + to_human_size(totalBytes) + ")", halign=Gtk.Align.START), 0, 0, 6, 1)
 
         # Progresso total
@@ -133,7 +132,7 @@ class VideoProgressDialog(Gtk.Dialog):
                     sufixoArquivo = self.sufixoArquivo
 
                 # Cria o nome do arquivo de destino
-                novoArquivo = self.dir_destino + os.sep + nome[:nome.rfind(".")] + sufixoArquivo
+                novoArquivo =  os.path.dirname(arquivo) + os.sep + nome[:nome.rfind(".")] + sufixoArquivo
                 novoArquivo = novoArquivo.replace("${EXTENSAO}", extensao)
                 if self.arquivoDestino is not None:
                     novoArquivo = self.arquivoDestino
@@ -254,7 +253,7 @@ class ExtrairDialog(Gtk.Dialog):
     """
     Dialog utilizada para solicitar ao usuário o tempo de início e fim que será extraído do video
     """
-    
+
     editInicio = None
     editFim = None
     duracaoVideo = None
@@ -327,7 +326,7 @@ class CropDialog(Gtk.Dialog):
     """
     Dialog utilizado para solicitar a região do vídeo que será extraída
     """
-    
+
     spinX = None
     spinY = None
     spinW = None
@@ -405,9 +404,9 @@ class CropDialog(Gtk.Dialog):
 
 class DeshakeDialog(Gtk.Dialog):
     """
-    Dialog utilizado para solicitar ao usuário os parâmetros do de-shake 
+    Dialog utilizado para solicitar ao usuário os parâmetros do de-shake
     """
-    
+
     spinX = None
     spinnerZoon = None
 
@@ -477,7 +476,7 @@ class InputDialog(Gtk.Dialog):
     """
     Dialog de solicitação de dados em um campo de texto ou combo
     """
-    
+
     textField = None
     comboBox = None
 
@@ -615,7 +614,7 @@ class LogViewerDialog(Gtk.Dialog):
     """
     Dialogo para exibição do log
     """
-    
+
     def __init__(self, parent):
         Gtk.Dialog.__init__(self, "Log da aplicação", parent, 0, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
@@ -1107,7 +1106,7 @@ class MainWindow(Gtk.Window):
         savedStdout = sys.stdout
 
         # Efetua o processamento dos arquivos
-        dialogVideo = VideoProgressDialog(gMainWindow, arquivos, self.editOrigem.get_text(), titulo, params, sufixoArquivo, arquivoDestino, segundosTotal)
+        dialogVideo = VideoProgressDialog(gMainWindow, arquivos, titulo, params, sufixoArquivo, arquivoDestino, segundosTotal)
         dialogVideo.run()
 
         # Força a interrupção da conversão caso o usuário pressione cancel
@@ -1153,7 +1152,7 @@ class MainWindow(Gtk.Window):
         """
         Cria um botão com um ícone e um texto
         """
-    
+
         debug("Criando botão: " + label)
         button = Gtk.Button.new()
         bGrid = Gtk.Grid()
@@ -1172,7 +1171,7 @@ class MainWindow(Gtk.Window):
 
 def seconds_to_time(secs):
     """
-    Converte segundos para o formato HH:MM:SS 
+    Converte segundos para o formato HH:MM:SS
     """
 
     return time.strftime('%H:%M:%S', time.gmtime(secs))
@@ -1182,7 +1181,7 @@ def time_to_seconds(time):
     """
     Converte do formato HH:MM:SS para segundos
     """
-    
+
     ftr = [3600, 60, 1]
     try:
         return sum([a * b for a, b in zip(ftr, map(int, time.split(':')))])
@@ -1194,7 +1193,7 @@ def get_caminho_ffmpeg():
     """
     Retorna o caminho onde of FFMPEG está configurado
     """
-    
+
     app = get_app_settings("caminho_ffmpeg")
     return app if app is not None else "ffmpeg"
 
@@ -1204,7 +1203,7 @@ def compareTreeItem(model, row1, row2, user_data):  # @UnusedVariable
     """
     Compara 2 ítens de uma tree
     """
-    
+
     sortColumn, _ = model.get_sort_column_id()
     value1 = model.get_value(row1, sortColumn)
     value2 = model.get_value(row2, sortColumn)
@@ -1235,7 +1234,7 @@ def indent_xml(elem, level=0):
     """
     Formata um arquivo XML
     """
-    
+
     i = "\n" + level * "\t"
     if len(elem):
         if not elem.text or not elem.text.strip():
@@ -1278,7 +1277,7 @@ def get_app_settings(xmlTag):
     """
     Recupera uma configuração da aplicação
     """
-    
+
     nodeCaminho = ET.parse(ARQUIVO_XML_SETTINGS, ET.XMLParser(remove_comments=False, strip_cdata=False)).find("./" + xmlTag)
     return None if nodeCaminho is None else nodeCaminho.text
 
@@ -1300,7 +1299,7 @@ def debug(msg=''):
     """
     Loga uma mensagem
     """
-    
+
     try:
         linha = str(msg).strip()
     except (UnicodeEncodeError):
@@ -1313,7 +1312,7 @@ def to_human_size(nbytes):
     """
     Converte uma quantidade de bytes em formato de fácil visualização
     """
-    
+
     human = nbytes
     rank = 0
     if nbytes != 0:
@@ -1328,7 +1327,7 @@ def on_close(self, widget):  # @UnusedVariable
     """
     Fecha a aplicação, liberando o FileHandler do log
     """
-    
+
     logHandler.close()
     gLogger.removeHandler(logHandler)
     sys.exit()
@@ -1381,7 +1380,7 @@ def get_ffmpeg_features():
 
 
 # Versão da aplicação
-VERSAO_APLICACAO = "v1.0" 
+VERSAO_APLICACAO = "v1.0"
 
 
 # Constantes da aplicação
@@ -1395,7 +1394,7 @@ ARQUIVO_VIDEOS_CONCATENA = DIR_APPLICATION + os.sep + "videos_concatena.txt"
 IS_WINDOWS = sys.platform.startswith('win')
 
 # Variáveis globais da aplicação
-# Nota: por convenção, as variáveis globais são camelCase e iniciam com um 'g' 
+# Nota: por convenção, as variáveis globais são camelCase e iniciam com um 'g'
 
 # Controle do ffmpeg
 gProcessoFfmpeg = None  # Representa a instância do processo do ffmpeg
